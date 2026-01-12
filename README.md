@@ -368,11 +368,17 @@ for i := 0; i < 1000000; i++ {
 ## 练习命令
 
 ```bash
-# 初始化练习代码
-go run main.go
+# 运行示例
+go run cmd/main.go
 
 # 运行测试
 go test -v ./...
+
+# 查看面试答案（原理讲解）
+cat answers/01-data-structure.md      # 数据结构原理
+cat answers/02-concurrency.md         # 并发编程原理
+cat answers/03-memory-gc.md           # 内存与GC原理
+cat answers/04-hot-questions.md       # 高频面试题速查
 
 # 检查代码质量
 go vet ./...
@@ -387,6 +393,28 @@ go tool pprof cpu.prof
 # 内存分析
 go test -memprofile=mem.prof
 go tool pprof mem.prof
+```
+
+---
+
+## 项目结构
+
+```
+interview/
+├── README.md              # 本文件
+├── cmd/
+│   └── main.go            # 示例程序
+├── answers/               # ⭐ 面试答案（原理详解）
+│   ├── 01-data-structure.md    # Slice/Map/Interface/String
+│   ├── 02-concurrency.md       # GMP/Channel/Context/Sync
+│   ├── 03-memory-gc.md         # 内存分配/GC/逃逸分析
+│   └── 04-hot-questions.md     # 100+高频面试题速查
+├── basics/                # 基础练习代码
+├── concurrency/           # 并发练习代码
+├── memory/                # 内存管理练习代码
+├── advanced/              # 高级特性练习代码
+├── interview/             # 面试高频题代码
+└── algorithm/             # 算法练习代码
 ```
 
 ---

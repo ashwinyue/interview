@@ -150,8 +150,8 @@ func TestPipeline(t *testing.T) {
 
 // 练习7：检测 goroutine 泄漏
 func TestGoroutineLeak(t *testing.T) {
-	// 错误示例：goroutine 永远阻塞
-	leakyFunc := func() {
+	// 错误示例：goroutine 永远阻塞（仅作演示，不调用）
+	_ = func() {
 		ch := make(chan int)
 		go func() {
 			val := <-ch // 如果没有发送者，永远阻塞
@@ -188,7 +188,7 @@ func TestMutexTypes(t *testing.T) {
 	var mu sync.Mutex
 	var count int
 
-	increment := func() {
+	_ = func() { // increment 示例，仅作演示
 		mu.Lock()
 		defer mu.Unlock()
 		count++
@@ -198,13 +198,13 @@ func TestMutexTypes(t *testing.T) {
 	var rwmu sync.RWMutex
 	var data map[string]string
 
-	read := func(key string) string {
+	_ = func(key string) string { // read 示例，仅作演示
 		rwmu.RLock()
 		defer rwmu.RUnlock()
 		return data[key]
 	}
 
-	write := func(key, value string) {
+	_ = func(key, value string) { // write 示例，仅作演示
 		rwmu.Lock()
 		defer rwmu.Unlock()
 		if data == nil {
