@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"interview/concurrency"
-	"interview/interview"
+	"sync"
+	"time"
 )
 
 func main() {
@@ -16,11 +16,57 @@ func main() {
 	runExamples()
 }
 
+// RateLimiter 令牌桶限流器
+type RateLimiter struct {
+	rate     int       // 每秒令牌数
+	capacity int       // 桶容量
+	tokens   int       // 当前令牌数
+	lastTime time.Time // 上次取令牌时间
+	mu       sync.Mutex
+}
+
+func NewRateLimiter(rate, capacity int) *RateLimiter {
+	return &RateLimiter{
+		rate:     rate,
+		capacity: capacity,
+		tokens:   capacity,
+		lastTime: time.Now(),
+	}
+}
+
+func (rl *RateLimiter) Allow() bool {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	now := time.Now()
+	elapsed := now.Sub(rl.lastTime).Seconds()
+
+	// 计算新增令牌数
+	newTokens := int(elapsed * float64(rl.rate))
+	if newTokens > 0 {
+		rl.tokens = min(rl.capacity, rl.tokens+newTokens)
+		rl.lastTime = now
+	}
+
+	if rl.tokens > 0 {
+		rl.tokens--
+		return true
+	}
+	return false
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func runExamples() {
-	fmt.Println("【示例1】限流器 (Rate Limiter)")
+	fmt.Println("【示例】令牌桶限流器 (Rate Limiter)")
 	fmt.Println("----------------------------------------")
 
-	limiter := interview.NewRateLimiter(10, 20) // 每秒10个令牌，容量20
+	limiter := NewRateLimiter(10, 20) // 每秒10个令牌，容量20
 	fmt.Printf("限流器配置: rate=%d req/s, capacity=%d\n\n", 10, 20)
 
 	fmt.Println("发送 25 个请求:")
@@ -33,11 +79,7 @@ func runExamples() {
 			fmt.Printf("  [%2d] ✗ 拒绝\n", i+1)
 		}
 	}
-	fmt.Printf("\n成功: %d, 拒绝: %d\n\n", successCount, 25-successCount)
-
-	// 等待令牌恢复
-	fmt.Println("等待 1 秒后令牌恢复...")
-	// 实际场景中可以使用 time.Sleep
+	fmt.Printf("\n成功: %d, 拒绝: %d\n", successCount, 25-successCount)
 
 	fmt.Println("\n========================================")
 	fmt.Println("更多练习请查看各目录下的测试文件:")
@@ -52,8 +94,7 @@ func runExamples() {
 	fmt.Println("  go test -v ./basics/         # 基础练习")
 	fmt.Println("  go test -v ./concurrency/    # 并发练习")
 	fmt.Println("  go test -v ./interview/      # 面试题练习")
-	fmt.Println()
-
-	// 导入并发包（避免 unused 错误）
-	_ = concurrency.TestWorkerPool
+	fmt.Println("\n查看详细学习计划:")
+	fmt.Println("  cat README.md")
+	fmt.Println("========================================")
 }
